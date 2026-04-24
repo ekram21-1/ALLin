@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>For Paris 🌹</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080508;
+  --rose:#c2748e;
+  --deep:#7a3352;
+  --gold:#c9a86c;
+  --text:#f0e6ea;
+  --muted:#8a7080;
+  --card:rgba(255,255,255,0.035);
+  --border:rgba(194,116,142,0.15);
+}
+
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── Background ── */
+.bg-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(122,51,82,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(194,116,142,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(201,168,108,0.05) 0%, transparent 60%);
+}
+
+/* Stars */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.05;}50%{opacity:0.6;}}
+
+/* Petals */
+.petal{position:fixed;z-index:0;pointer-events:none;font-size:1rem;opacity:0;animation:petalFall linear infinite;}
+@keyframes petalFall{
+  0%{transform:translateY(-5vh) rotate(0deg) translateX(0px);opacity:0;}
+  8%{opacity:0.35;}
+  92%{opacity:0.15;}
+  100%{transform:translateY(108vh) rotate(400deg) translateX(30px);opacity:0;}
+}
+
+/* ── Hero ── */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:2rem;
+}
+
+.hero-eyebrow{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;
+  color:var(--rose);opacity:0;
+  animation:fadeUp 1s ease 0.3s forwards;
+  margin-bottom:1.2rem;
+}
+
+.hero-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(4.5rem,16vw,10rem);
+  font-weight:300;
+  letter-spacing:-0.02em;
+  line-height:0.9;
+  color:var(--text);
+  opacity:0;
+  animation:fadeUp 1.1s ease 0.5s forwards;
+  position:relative;
+}
+.hero-name em{
+  font-style:italic;
+  color:var(--rose);
+  display:block;
+}
+
+.hero-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,3vw,1.35rem);
+  font-weight:300;font-style:italic;
+  color:var(--muted);
+  margin-top:1.2rem;
+  opacity:0;
+  animation:fadeUp 1s ease 0.9s forwards;
+  max-width:420px;
+  line-height:1.7;
+}
+
+.scroll-hint{
+  margin-top:3.5rem;
+  opacity:0;
+  animation:fadeUp 1s ease 1.4s forwards;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;
+}
+.scroll-line{
+  width:1px;height:40px;
+  background:linear-gradient(to bottom, var(--rose), transparent);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(1);}50%{opacity:1;transform:scaleY(1.15);}}
+
+/* ── Section ── */
+.section{
+  position:relative;z-index:1;
+  padding:5rem 2rem 4rem;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.section-label{
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:3rem;text-align:center;
+  opacity:0;animation:fadeUp 0.8s ease forwards;
+  animation-play-state:paused;
+}
+.section-label.visible{animation-play-state:running;}
+
+/* ── Cards grid ── */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1.2rem;
+}
+
+.card{
+  position:relative;
+  background:var(--card);
+  border:0.5px solid var(--border);
+  border-radius:20px;
+  padding:2rem 1.5rem;
+  text-decoration:none;
+  color:var(--text);
+  overflow:hidden;
+  transition:transform 0.35s cubic-bezier(.34,1.56,.64,1), border-color 0.3s, box-shadow 0.3s;
+  opacity:0;
+  animation:fadeUp 0.7s ease forwards;
+  animation-play-state:paused;
+  cursor:pointer;
+  display:flex;flex-direction:column;gap:0.8rem;
+}
+.card.visible{animation-play-state:running;}
+.card:nth-child(1){animation-delay:0.05s;}
+.card:nth-child(2){animation-delay:0.15s;}
+.card:nth-child(3){animation-delay:0.25s;}
+.card:nth-child(4){animation-delay:0.35s;}
+
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:radial-gradient(circle at 50% 0%, rgba(194,116,142,0.08), transparent 70%);
+  opacity:0;transition:opacity 0.3s;
+}
+.card:hover{
+  transform:translateY(-6px) scale(1.02);
+  border-color:rgba(194,116,142,0.4);
+  box-shadow:0 20px 50px rgba(122,51,82,0.25), 0 4px 16px rgba(0,0,0,0.3);
+}
+.card:hover::before{opacity:1;}
+
+.card-icon{
+  font-size:2.2rem;
+  line-height:1;
+  filter:drop-shadow(0 0 12px rgba(194,116,142,0.4));
+}
+.card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:400;
+  color:var(--text);line-height:1.2;
+}
+.card-desc{
+  font-size:0.8rem;color:var(--muted);line-height:1.6;
+  font-weight:300;flex:1;
+}
+.card-arrow{
+  font-size:0.75rem;color:var(--rose);
+  letter-spacing:0.1em;margin-top:0.4rem;
+  transition:transform 0.25s;display:inline-block;
+}
+.card:hover .card-arrow{transform:translateX(4px);}
+
+/* ── Footer ── */
+.footer{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:4rem 2rem 6rem;
+}
+.footer-rose{
+  font-size:3rem;
+  animation:pulse 2.5s ease-in-out infinite;
+  display:block;margin-bottom:1.2rem;
+}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.footer-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,3vw,1.25rem);
+  font-style:italic;
+  color:var(--muted);
+  line-height:1.8;
+}
+.footer-text strong{color:var(--rose);font-style:normal;}
+
+/* ── Divider ── */
+.divider{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:1.5rem;
+  max-width:500px;margin:0 auto;padding:0 2rem;
+  opacity:0.18;
+}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--rose);}
+
+/* ── Animations ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@media(max-width:500px){
+  .cards{grid-template-columns:1fr 1fr;}
+  .card{padding:1.5rem 1rem;}
+  .card-title{font-size:1.15rem;}
+}
+@media(max-width:360px){
+  .cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div id="stars"></div>
+<div id="petals"></div>
+
+<!-- Hero -->
+<section class="hero">
+  <p class="hero-eyebrow">made with love, just for</p>
+  <h1 class="hero-name">
+    Paris
+    <em>Infiel</em>
+  </h1>
+  <p class="hero-sub">Everything on this page was made for you — with sincerity, effort, and a whole lot of feelings. 🌹</p>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>explore</span>
+  </div>
+</section>
+
+<div class="divider"><span>🌹</span></div>
+
+<!-- Cards -->
+<section class="section">
+  <p class="section-label" id="sectionLabel">— everything I made for you —</p>
+  <div class="cards" id="cards">
+
+    <a class="card" href="paris-quiz.html">
+      <div class="card-icon">💌</div>
+      <div class="card-title">The Big Question</div>
+      <div class="card-desc">A little quiz about you — ending with something I really wanted to ask.</div>
+      <span class="card-arrow">Open →</span>
+    </a>
+
+    <a class="card" href="our-song.html">
+      <div class="card-icon">🎵</div>
+      <div class="card-title">Song</div>
+      <div class="card-desc">Risk It All by Bruno Mars — synced with the lyrics and a letter for you at the end.</div>
+      <span class="card-arrow">Listen →</span>
+    </a>
+
+    <a class="card" href="album.html">
+      <div class="card-icon">📸</div>
+      <div class="card-title">Album</div>
+      <div class="card-desc">A glimpse of her childhood — the little girl who grew up to mean everything to me.</div>
+      <span class="card-arrow">View →</span>
+    </a>
+
+    <a class="card" href="letter.html">
+      <div class="card-icon">🌸</div>
+      <div class="card-title">What I Love About You</div>
+      <div class="card-desc">All the little things about you that I notice, appreciate, and adore.</div>
+      <span class="card-arrow">Read →</span>
+    </a>
+
+  </div>
+</section>
+
+<div class="divider" style="margin-top:1rem;"><span>🌹</span></div>
+
+<!-- Footer -->
+<footer class="footer">
+  <span class="footer-rose">🌹</span>
+  <p class="footer-text">
+    Paris, everything here was made with one goal —<br/>
+    to show you that <strong>you are worth every effort.</strong><br/>
+    Thank you for giving me this chance. 🤍
+  </p>
+  <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--muted);letter-spacing:0.12em;">— Marky 🖤</p>
+</footer>
+
+<script>
+// Stars
+const starsEl = document.getElementById('stars');
+for(let i=0;i<140;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2+0.4;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*6}s;`;
+  starsEl.appendChild(s);
+}
+
+// Petals
+const petalsEl=document.getElementById('petals');
+const emojis=['🌹','🌸','🌺','🥀','✿'];
+for(let i=0;i<16;i++){
+  const p=document.createElement('div');p.className='petal';
+  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${12+Math.random()*16}s;animation-delay:${Math.random()*14}s;font-size:${0.7+Math.random()*0.9}rem;`;
+  petalsEl.appendChild(p);
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+    }
+  });
+},{threshold:0.15});
+
+document.querySelectorAll('.section-label, .card').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>

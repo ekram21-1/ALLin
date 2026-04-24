@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para kay Paris 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blush: #f2c4ce;
+    --rose: #e8899a;
+    --deep-rose: #c4556a;
+    --petal: #fde8ed;
+    --cream: #fdf6f0;
+    --text: #3a1f28;
+    --muted: #9b6b76;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* Petals */
+  .petals-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute;
+    width: 12px;
+    height: 16px;
+    background: var(--blush);
+    border-radius: 50% 0 50% 0;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  .petal:nth-child(odd) { background: #f7d6dc; border-radius: 0 50% 0 50%; }
+  .petal:nth-child(3n) { background: #fce4e8; width: 8px; height: 12px; }
+
+  @keyframes fall {
+    0% { transform: translateY(-40px) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Music player button */
+  .music-btn {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 2rem;
+    z-index: 100;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid var(--blush);
+    box-shadow: 0 4px 24px rgba(196,85,106,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+  }
+  .music-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 28px rgba(196,85,106,0.22);
+  }
+  .music-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--deep-rose);
+    transition: opacity 0.2s;
+  }
+  .music-btn .note-icon { display: block; }
+  .music-btn .pause-icon { display: none; }
+  .music-btn.playing .note-icon { display: none; }
+  .music-btn.playing .pause-icon { display: block; }
+
+  /* Vinyl spin ring around button when playing */
+  .music-btn::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--blush);
+    opacity: 0;
+    animation: spin 4s linear infinite;
+    transition: opacity 0.4s;
+  }
+  .music-btn.playing::after { opacity: 1; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Tooltip */
+  .music-tooltip {
+    position: fixed;
+    right: 5rem;
+    bottom: 2.6rem;
+    background: white;
+    border: 1px solid var(--blush);
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 99;
+  }
+  .music-tooltip.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    z-index: 1;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(242,196,206,0.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .for-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.3s;
+  }
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(5rem, 18vw, 11rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--deep-rose);
+    line-height: 1;
+    opacity: 0;
+    animation: fadeUp 1.2s ease forwards 0.6s;
+    position: relative;
+  }
+  .hero-name::after {
+    content: '🌸';
+    font-size: 0.3em;
+    position: absolute;
+    top: 0.5em;
+    right: -0.5em;
+  }
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    font-style: italic;
+    color: var(--muted);
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1s;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rose);
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.6s, bob 2s ease-in-out infinite 2.5s;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Sections */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+  }
+  .section-inner { max-width: 700px; margin: 0 auto; }
+  .section-tag {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--deep-rose);
+    margin-bottom: 2rem;
+    line-height: 1.2;
+  }
+  .divider {
+    text-align: center;
+    color: var(--blush);
+    font-size: 1.5rem;
+    letter-spacing: 0.5rem;
+    padding: 1rem 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  /* Love letter */
+  .love-letter {
+    background: white;
+    border: 1px solid var(--blush);
+    border-radius: 2px;
+    padding: 3rem;
+    position: relative;
+    box-shadow: 0 2px 40px rgba(196,85,106,0.06);
+  }
+  .love-letter::before {
+    content: '❝';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    color: var(--petal);
+    position: absolute;
+    top: 0.5rem;
+    left: 1.5rem;
+    line-height: 1;
+  }
+  .love-letter p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    line-height: 2;
+    color: var(--text);
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+  .love-letter .signature {
+    margin-top: 2rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  /* Reasons */
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .reason-card {
+    background: white;
+    border: 1px solid var(--blush);
+    border-radius: 2px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .reason-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(196,85,106,0.1);
+  }
+  .reason-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+  .reason-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--deep-rose);
+    margin-bottom: 0.5rem;
+  }
+  .reason-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+  /* Polaroid photo */
+  .polaroid-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .polaroid {
+    background: white;
+    padding: 1rem 1rem 3.5rem 1rem;
+    box-shadow: 0 8px 32px rgba(196,85,106,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    transform: rotate(-2deg);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    max-width: 320px;
+    width: 100%;
+  }
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.02);
+    box-shadow: 0 16px 48px rgba(196,85,106,0.18);
+  }
+  .polaroid-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    background: var(--petal);
+    /* placeholder style when no image loaded */
+    min-height: 260px;
+  }
+  .polaroid-caption {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Closing poem */
+  .poem-letter {
+    background: white;
+    border: 1px solid var(--blush);
+    border-radius: 2px;
+    padding: 3rem 2rem;
+    position: relative;
+    box-shadow: 0 2px 40px rgba(196,85,106,0.06);
+  }
+  .poem-letter::before {
+    content: '❝';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    color: var(--petal);
+    position: absolute;
+    top: 0.5rem;
+    left: 1.5rem;
+    line-height: 1;
+  }
+  .poem-letter p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    line-height: 2.2;
+    color: var(--text);
+    font-style: italic;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 4rem 2rem 6rem;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-heart {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1.5rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.15); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.1); }
+    70% { transform: scale(1); }
+  }
+  .footer-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--deep-rose);
+    margin-bottom: 0.75rem;
+  }
+  .footer-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+    max-width: 420px;
+    margin: 0 auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- Audio -->
+<audio id="bgMusic" loop>
+  <source src="risk1.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Petals -->
+<div class="petals-bg" id="petals"></div>
+
+<!-- Music button -->
+<button class="music-btn" id="musicBtn" title="I-play ang musika">
+  <!-- Note icon (paused state) -->
+  <svg class="note-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" fill="none" stroke="#c4556a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <!-- Pause icon (playing state) -->
+  <svg class="pause-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="4" width="4" height="16" rx="1" fill="#c4556a"/>
+    <rect x="14" y="4" width="4" height="16" rx="1" fill="#c4556a"/>
+  </svg>
+</button>
+<div class="music-tooltip" id="musicTooltip">i-play ang musika 🎵</div>
+
+<!-- Hero -->
+<div class="hero">
+  <span class="for-label">Para kay</span>
+  <h1 class="hero-name">Paris</h1>
+  <p class="hero-subtitle">mula sa puso na sayo lamang nagtatapat 🌸</p>
+  <span class="scroll-hint">↓ magpatuloy ↓</span>
+</div>
+
+<div class="divider">· · ✿ · ·</div>
+
+<!-- Love Letter -->
+<section>
+  <div class="section-inner">
+    <span class="section-tag">liham mula sa puso</span>
+    <h2 class="section-title">Mahal kong Paris,</h2>
+    <div class="love-letter">
+      <p>
+        Hindi ko alam kung paano sinimulan ng mundo ang paglikha sa iyo —
+        ngunit tiyak akong bawat detalye ay pinag-isipang mabuti ng mga bituin
+        bago ka pa man isinilang. Ang iyong ngiti ay parang unang liwanag ng umaga
+        na kahit anong dilim ay hindi kayang pigilan. Ang iyong mga mata ay parang
+        dagat na malalim — mapanganib manlangoy, ngunit para sa iyo,
+        handa akong malunod nang walang pagsisisi.
+        <br><br>
+        Mayroon kang uri ng kagandahang hindi nakikita sa salamin —
+        ang uri na nararamdaman ng mga pusong mapalad na malapit sa iyo.
+        Ikaw ay isang buhay na tula na hindi ko kayang isulat nang buo,
+        sapagkat sa bawat tingin ko sa iyo, may bagong linya pa ring sumusulpot
+        mula sa pinakamalalim na sulok ng aking puso.
+        <br><br>
+        Nais ko lamang sabihin sa iyo, Paris — sa lahat ng bagay na may halaga
+        sa mundong puno ng ingay at kalikutan,
+        ikaw ang tahimik na sagot sa tanong na matagal ko nang tinatanong.
+        <em>Ikaw ang dahilan kung bakit ako nagpapasalamat
+        sa bawat pagkakataong mabuhay.</em>
+      </p>
+      <div class="signature">— Buong pagmamahal, Marky Cielo Bautista (best piercer🤍)</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ✿ · ·</div>
+
+<!-- Reasons -->
+<section>
+  <div class="section-inner">
+    <span class="section-tag">mga dahilan ng pagmamahal</span>
+    <h2 class="section-title">Ang mga bagay sa iyo na hindi ko makalimutan</h2>
+    <div class="reasons-grid">
+      <div class="reason-card">
+        <span class="reason-icon">😊</span>
+        <div class="reason-title">Ang Iyong Ngiti</div>
+        <p class="reason-desc">Sa bawat ngiti mo, parang nahahanap ng mundo ang dahilan nito para umikot. Mahirap tumingin sa iyo — mas mahirap pa lumayo.</p>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">👁️</span>
+        <div class="reason-title">Ang Iyong mga Mata</div>
+        <p class="reason-desc">Sa mga matang iyon, nakikita ko ang isang daigdig na hindi ako natakot tuklasin. Tapat, malinaw, at walang hanggang lalim.</p>
+      </div>
+      <div class="reason-card">
+        <span class="reason-icon">🌸</span>
+        <div class="reason-title">Ang Iyong Pagkatao</div>
+        <p class="reason-desc">Hindi ka nagkukunwari. Hindi ka naghahanap ng papuri. Ikaw ay ikaw lamang — at iyon ang pinaka-bihirang bagay sa buong mundo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ✿ · ·</div>
+
+<!-- Polaroid Photo -->
+<section>
+  <div class="section-inner">
+    <div class="polaroid-wrap">
+      <div class="polaroid">
+        <!-- Replace "your-photo.jpg" with your actual image filename -->
+        <img class="polaroid-img" src="paris1.jpg" alt="Paris" onerror="this.style.background='#fde8ed'; this.style.minHeight='260px';">
+        <div class="polaroid-caption">🌸</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ✿ · ·</div>
+
+<!-- Closing Poem -->
+<section>
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-tag">isang huling salita</span>
+    <div class="poem-letter">
+      <p>
+        Kung ang pag-ibig ay isang tula,<br>
+        ikaw ang bawat linya nito —<br>
+        ang simula, ang gitna,<br>
+        at ang katapusang ayaw kong abutin.<br><br>
+        Kung ang buhay ay isang aklat,<br>
+        ang mga pahinang kasama ka<br>
+        ay ang mga pahina na paulit-ulit kong babasahin.<br><br>
+        Hindi dahil perpekto ka —<br>
+        kundi dahil para sa akin,<br>
+        ikaw ay sapat na. Ikaw ay higit pa sa lahat.</em>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Petals
+  const container = document.getElementById('petals');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 10) + 's';
+    p.style.animationDelay = (Math.random() * 12) + 's';
+    container.appendChild(p);
+  }
+
+  // Music player
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicBtn');
+  const tooltip = document.getElementById('musicTooltip');
+  let playing = false;
+
+  // Show tooltip on load briefly
+  setTimeout(() => { tooltip.classList.add('show'); }, 1500);
+  setTimeout(() => { tooltip.classList.remove('show'); }, 4000);
+
+  btn.addEventListener('click', () => {
+    if (playing) {
+      audio.pause();
+      btn.classList.remove('playing');
+      tooltip.textContent = 'i-play ang musika 🎵';
+    } else {
+      audio.play().catch(() => {});
+      btn.classList.add('playing');
+      tooltip.textContent = 'tumutugtog na 🎵';
+    }
+    playing = !playing;
+    tooltip.classList.add('show');
+    setTimeout(() => tooltip.classList.remove('show'), 2000);
+  });
+</script>
+</body>
+</html>

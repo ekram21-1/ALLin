@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>A Little Quiz for Paris 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --rose: #f4a7b9;
+    --blush: #fde8ee;
+    --petal: #fdf0f5;
+    --mauve: #c2748e;
+    --deep: #8b4a62;
+    --soft: #fff5f8;
+    --text: #5a3045;
+    --gold: #d4a373;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background: var(--petal);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.petal-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.petal-bg span {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.25;
+    animation: floatPetal linear infinite;
+}
+@keyframes floatPetal {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.3; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+.card {
+    position: relative;
+    z-index: 1;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 8px 48px rgba(194, 116, 142, 0.18), 0 2px 12px rgba(194,116,142,0.10);
+    padding: 3rem 2.8rem 2.5rem;
+    max-width: 520px;
+    width: 92%;
+    text-align: center;
+    animation: fadeUp 0.7s ease both;
+    border: 1.5px solid #f9d5e3;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.progress-wrap {
+    width: 100%;
+    height: 6px;
+    background: var(--blush);
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose), var(--mauve));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+.question-number {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    color: var(--mauve);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+}
+
+.question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    color: var(--text);
+    line-height: 1.45;
+    margin-bottom: 2rem;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.option-btn {
+    background: var(--soft);
+    border: 1.5px solid #f0c4d4;
+    border-radius: 14px;
+    padding: 0.85rem 1.2rem;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.97rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.22s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+.option-btn:hover {
+    background: var(--blush);
+    border-color: var(--rose);
+    transform: translateX(4px);
+}
+.option-btn.selected {
+    background: linear-gradient(135deg, #fde8ee, #fcd0e0);
+    border-color: var(--mauve);
+    font-weight: 400;
+}
+.option-btn .bullet {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    color: var(--mauve);
+    background: white;
+    transition: all 0.2s;
+}
+.option-btn.selected .bullet {
+    background: var(--mauve);
+    border-color: var(--mauve);
+    color: white;
+}
+
+.next-btn {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0.9rem 2.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 18px rgba(194,116,142,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+}
+.next-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+.next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(194,116,142,0.4);
+}
+
+.final-section { display: none; }
+.final-section.active { display: block; animation: fadeUp 0.8s ease both; }
+
+.photo-placeholder {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--blush), #fce4ec);
+    border: 3px solid var(--rose);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--mauve);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 24px rgba(244,167,185,0.3);
+    overflow: hidden;
+}
+.photo-placeholder span { font-size: 2.5rem; margin-bottom: 0.3rem; }
+
+.final-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 0.5rem;
+}
+.final-sub {
+    font-size: 0.9rem;
+    color: var(--mauve);
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+}
+
+.court-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.yes-btn, .no-btn {
+    border-radius: 14px;
+    padding: 0.9rem 2.2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s ease;
+}
+.yes-btn {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: white;
+    box-shadow: 0 4px 18px rgba(194,116,142,0.35);
+}
+.yes-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 8px 28px rgba(194,116,142,0.45); }
+.no-btn {
+    background: white;
+    color: var(--mauve);
+    border: 1.5px solid var(--rose);
+}
+.no-btn:hover { background: var(--blush); transform: translateX(8px); }
+
+.music-note {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    font-size: 1.3rem;
+    animation: pulse 1.5s ease-in-out infinite;
+    color: var(--rose);
+    cursor: pointer;
+    display: none;
+}
+.music-note.show { display: block; }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
+
+.result-screen {
+    display: none;
+    animation: fadeUp 0.8s ease both;
+}
+.result-screen.active { display: block; }
+.result-screen .big-emoji { font-size: 4rem; margin-bottom: 1rem; }
+.result-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 0.7rem;
+}
+.result-screen p {
+    color: var(--mauve);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 999;
+    animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+    0%  { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100%{ transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+#intro-screen .big-emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+#intro-screen h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+#intro-screen p {
+    color: var(--mauve);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    line-height: 1.6;
+}
+.start-btn {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0.95rem 2.8rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(194,116,142,0.3);
+    transition: all 0.25s;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(194,116,142,0.4); }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<div class="petal-bg" id="petalBg"></div>
+
+<audio id="bgSong" loop>
+<source src="jtwyr.mp3" type="audio/mpeg"/>
+</audio>
+
+<div class="card">
+<div class="music-note" id="musicNote" title="Playing a song for you 🎵">🎵</div>
+
+<!-- INTRO -->
+<div class="screen active" id="intro-screen">
+    <div class="big-emoji">🌸</div>
+    <h1>Hey, Paris!</h1>
+    <p>Before anything else, there's something I'd love to ask you.<br/>But first — a little quiz. 💕</p>
+    <button class="start-btn" onclick="startQuiz()">Let's Begin →</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quiz-screen">
+    <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="question-number" id="qNumber">Question 1 of 5</div>
+    <div class="question-text" id="qText"></div>
+    <div class="options" id="qOptions"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+</div>
+
+<!-- FINAL QUESTION -->
+<div class="screen" id="final-screen">
+    <div class="photo-placeholder">
+    <img src="pic.jpg" alt="Paris" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />
+    </div>
+    <p class="question-number">The Final Question</p>
+    <h2 class="final-title">Paris Infiel,<br/>Can I court you? 🌹</h2>
+    <p class="final-sub">I promise to make every day worth your smile.</p>
+    <div class="court-btns">
+    <button class="yes-btn" onclick="answerCourt(true)">Yes, you may 💕</button>
+    <button class="no-btn" id="noBtn" onclick="answerCourt(false)">Maybe later…</button>
+    </div>
+</div>
+
+<!-- RESULT YES -->
+<div class="screen" id="result-yes">
+    <div class="big-emoji">🥰</div>
+    <h2 class="final-title">She said YES! 🌸</h2>
+    <p style="color:var(--mauve); font-size:0.95rem; line-height:1.7; margin-top:0.5rem;">
+    This is just the beginning, Paris.<br/>
+    I'll make sure every moment counts. 💕
+    </p>
+</div>
+
+<!-- RESULT NO -->
+<div class="screen" id="result-no">
+    <div class="big-emoji">🥺</div>
+    <h2 class="final-title">I'll wait for you. 🌷</h2>
+    <p style="color:var(--mauve); font-size:0.95rem; line-height:1.7; margin-top:0.5rem;">
+    No rush, Paris. I'll be here. 💌
+    </p>
+</div>
+
+</div>
+
+<script>
+// ── EmailJS Setup ──
+emailjs.init("E3OLCr-J17yZ04ydz");
+
+const EMAILJS_SERVICE_ID  = "service_j1ldwqi";
+const EMAILJS_TEMPLATE_ID = "template_6i4zs09";
+
+const questions = [
+{
+    q: "If your perfect day had a color, what would it be?",
+    opts: ["Soft pink — warm and gentle 🌸", "Sky blue — calm and free 💙", "Golden yellow — bright and happy ☀️", "Deep purple — mysterious and cozy 💜"]
+},
+{
+    q: "What's your idea of a perfect date?",
+    opts: ["A quiet dinner with good music 🕯️", "An adventure outdoors 🌿", "Coffee and long conversations ☕", "Movie night at home 🎬"]
+},
+{
+    q: "Which of these words describes you best?",
+    opts: ["Kind-hearted 💛", "Strong-willed 🔥", "Playful and fun 🎉", "Deeply thoughtful 🌙"]
+},
+{
+    q: "What do you value most in a person?",
+    opts: ["Honesty and loyalty 🤝", "Kindness and patience 🌼", "Humor and wit 😄", "Passion and drive 🚀"]
+},
+{
+    q: "If someone wanted to win your heart, what would matter most?",
+    opts: ["Consistent effort and presence 💌", "Making me laugh every day 😂", "Understanding me deeply 🫶", "Small, thoughtful gestures 🌷"]
+}
+];
+
+let current = 0;
+let selected = null;
+let noMoves = 0;
+
+function startQuiz() {
+showScreen('quiz-screen');
+renderQuestion();
+}
+
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+const q = questions[current];
+document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+document.getElementById('qText').textContent = q.q;
+const opts = document.getElementById('qOptions');
+opts.innerHTML = '';
+q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="bullet">${String.fromCharCode(65+i)}</span>${o}`;
+    btn.onclick = () => selectOption(btn, i);
+    opts.appendChild(btn);
+});
+selected = null;
+const nb = document.getElementById('nextBtn');
+nb.classList.remove('visible');
+const fill = ((current) / questions.length) * 100;
+document.getElementById('progressFill').style.width = fill + '%';
+}
+
+function selectOption(btn, idx) {
+document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+btn.classList.add('selected');
+selected = idx;
+document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+if (selected === null) return;
+current++;
+if (current < questions.length) {
+    renderQuestion();
+} else {
+    goToFinal();
+}
+}
+
+function goToFinal() {
+document.getElementById('progressFill').style.width = '100%';
+showScreen('final-screen');
+const song = document.getElementById('bgSong');
+song.play().catch(() => {});
+document.getElementById('musicNote').classList.add('show');
+}
+
+function answerCourt(yes) {
+if (yes) {
+    showScreen('result-yes');
+    launchConfetti();
+    notifyYes();
+} else {
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.querySelector('.yes-btn');
+    noMoves++;
+
+    if (noMoves >= 4) {
+    showScreen('result-yes');
+    launchConfetti();
+    notifyYes();
+    return;
+    }
+
+    const yesScale = 1 + (noMoves * 0.3);
+    yesBtn.style.transform = `scale(${yesScale})`;
+    yesBtn.style.transition = 'transform 0.4s cubic-bezier(.34,1.56,.64,1), font-size 0.4s ease, padding 0.4s ease';
+    yesBtn.style.fontSize = (1.05 + noMoves * 0.18) + 'rem';
+    yesBtn.style.padding = `${0.9 + noMoves * 0.15}rem ${2.2 + noMoves * 0.3}rem`;
+
+    const noScale = Math.max(0.55, 1 - noMoves * 0.18);
+    noBtn.style.transform = `scale(${noScale})`;
+    noBtn.style.transition = 'transform 0.4s ease, font-size 0.4s ease, opacity 0.4s ease';
+    noBtn.style.opacity = Math.max(0.35, 1 - noMoves * 0.2);
+
+    const rx = (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 30);
+    const ry = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 20);
+    noBtn.style.position = 'relative';
+    noBtn.style.left = (parseFloat(noBtn.style.left || 0) + rx) + 'px';
+    noBtn.style.top  = (parseFloat(noBtn.style.top  || 0) + ry) + 'px';
+
+    const labels = ["Are you sure? 🥺", "Really? 😢", "Okay fine… 🤏"];
+    noBtn.textContent = labels[noMoves - 1] || "…";
+}
+}
+
+function launchConfetti() {
+const colors = ['#f4a7b9','#fde8ee','#c2748e','#d4a373','#fff','#f8bbd0'];
+for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.width = (8 + Math.random()*8) + 'px';
+    c.style.height = (8 + Math.random()*8) + 'px';
+    c.style.animationDuration = (2 + Math.random()*3) + 's';
+    c.style.animationDelay = (Math.random()*0.5) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+    }, i * 30);
+}
+}
+
+// ── EmailJS Notification ──
+function notifyYes() {
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        name: "Paris",
+        message: "Paris clicked YES on your quiz! Go get her! 🌹",
+        email: "sjc.markycielobautista@gmail.com"
+    })
+    .then(() => {
+        console.log("💌 Email sent! She said YES!");
+    })
+    .catch((err) => {
+        console.error("EmailJS error:", err);
+    });
+}
+
+// Generate floating petals
+const petalBg = document.getElementById('petalBg');
+const emojis = ['🌸','🌺','🌷','🌹','💮','🏵️','✿','❀'];
+for (let i = 0; i < 18; i++) {
+const span = document.createElement('span');
+span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+span.style.left = (Math.random()*100) + 'vw';
+span.style.animationDuration = (8 + Math.random()*14) + 's';
+span.style.animationDelay = (Math.random()*10) + 's';
+span.style.fontSize = (1 + Math.random()*1.5) + 'rem';
+petalBg.appendChild(span);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Risk It All 🌹 For Paris</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0a0e;
+  --rose:#c2748e;
+  --deep-rose:#8b4a62;
+  --gold:#d4a373;
+  --text:#f5e6ea;
+  --muted:#a08090;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(194,116,142,0.18);
+}
+body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;position:relative;}
+
+/* Stars */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1;transform:scale(1);}50%{opacity:0.8;transform:scale(1.3);}}
+
+/* Petals */
+.rose-petal{position:fixed;pointer-events:none;z-index:0;opacity:0;animation:fallPetal linear infinite;}
+@keyframes fallPetal{
+  0%{transform:translateY(-5vh) rotate(0deg);opacity:0;}
+  10%{opacity:0.4;}90%{opacity:0.2;}
+  100%{transform:translateY(105vh) rotate(360deg) translateX(40px);opacity:0;}
+}
+
+/* Wrapper */
+.wrapper{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:4rem 2rem 6rem;text-align:center;}
+
+.label{font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rose);margin-bottom:0.6rem;}
+.title{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:400;color:var(--text);line-height:1.2;margin-bottom:0.4rem;}
+.title span{font-style:italic;color:var(--rose);}
+.artist{font-size:0.9rem;color:var(--muted);font-weight:300;letter-spacing:0.08em;margin-bottom:0.5rem;}
+.dedication{font-size:0.85rem;color:var(--rose);font-style:italic;margin-bottom:3rem;opacity:0.8;}
+
+/* ── Vinyl / Photo Disc ── */
+.vinyl-wrap{position:relative;width:220px;height:220px;margin:0 auto 1.5rem;}
+
+.vinyl{
+  width:220px;height:220px;border-radius:50%;
+  position:relative;
+  border:4px solid #2a2020;
+  box-shadow:0 0 40px rgba(194,116,142,0.15),inset 0 0 20px rgba(0,0,0,0.5);
+  animation:spinVinyl 8s linear infinite;
+  animation-play-state:paused;
+  overflow:hidden;
+  cursor:pointer;
+}
+.vinyl.playing{animation-play-state:running;}
+@keyframes spinVinyl{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* Groove rings */
+.vinyl::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle,transparent 0px,transparent 6px,rgba(0,0,0,0.25) 6px,rgba(0,0,0,0.25) 7px);
+  z-index:1;pointer-events:none;
+}
+
+/* Photo area — fills entire disc */
+.vinyl-photo{
+  position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(135deg,#1a0a10,#2a1020);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.vinyl-photo img{
+  width:100%;height:100%;object-fit:cover;border-radius:50%;
+  filter:brightness(0.85) saturate(1.1);
+}
+.vinyl-photo-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;color:var(--muted);font-size:0.7rem;text-align:center;
+  gap:6px;padding:1rem;
+}
+.vinyl-photo-placeholder span{font-size:2rem;}
+
+/* Center hole */
+.vinyl-hole{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  background:#0d0a0e;
+  border:2px solid rgba(194,116,142,0.4);
+  z-index:3;pointer-events:none;
+}
+
+/* Shine overlay */
+.vinyl-shine{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,0.09) 0%,transparent 60%);
+  z-index:2;pointer-events:none;
+}
+
+/* Needle arm */
+.needle{
+  position:absolute;
+  top:-10px;right:-18px;
+  width:80px;height:80px;
+  transform-origin:top right;
+  transform:rotate(-28deg);
+  transition:transform 0.8s cubic-bezier(.4,0,.2,1);
+  z-index:5;pointer-events:none;
+}
+.needle.playing{transform:rotate(-5deg);}
+.needle svg{width:100%;height:100%;}
+
+/* Play button */
+.play-btn{
+  position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--rose),var(--deep-rose));
+  border:none;border-radius:50%;
+  width:52px;height:52px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;color:white;
+  box-shadow:0 4px 24px rgba(194,116,142,0.45);
+  transition:transform 0.2s,box-shadow 0.2s;
+  z-index:10;
+}
+.play-btn:hover{transform:translateX(-50%) scale(1.1);box-shadow:0 8px 32px rgba(194,116,142,0.6);}
+
+/* Progress bar */
+.progress-area{
+  margin-top:2rem;
+  display:flex;align-items:center;gap:12px;
+  width:100%;max-width:400px;margin-left:auto;margin-right:auto;
+}
+.time-label{font-size:0.75rem;color:var(--muted);min-width:36px;font-variant-numeric:tabular-nums;}
+.progress-track{
+  flex:1;height:4px;background:rgba(255,255,255,0.1);
+  border-radius:99px;cursor:pointer;position:relative;
+  overflow:hidden;
+}
+.progress-fill-bar{
+  height:100%;background:linear-gradient(90deg,var(--rose),var(--gold));
+  border-radius:99px;width:0%;transition:width 0.25s linear;pointer-events:none;
+}
+
+.audio-note{font-size:0.75rem;color:var(--muted);margin:0.8rem 0 3rem;font-style:italic;}
+
+/* ── Lyrics ── */
+.lyrics-wrap{text-align:center;margin:0 auto;max-width:500px;}
+.lyric-line{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1rem,3vw,1.15rem);
+  color:rgba(160,128,144,0.45);
+  line-height:2;
+  transition:color 0.5s ease,transform 0.4s ease,font-size 0.4s ease,text-shadow 0.5s ease,opacity 0.5s ease;
+  cursor:default;padding:0.05rem 0;display:block;
+}
+.lyric-line.active{
+  color:var(--text);
+  font-size:clamp(1.1rem,3.5vw,1.3rem);
+  text-shadow:0 0 30px rgba(194,116,142,0.5);
+}
+.lyric-line.highlight.active{
+  color:var(--rose);
+  font-size:clamp(1.15rem,4vw,1.4rem);
+  font-style:italic;
+  text-shadow:0 0 50px rgba(194,116,142,0.7);
+}
+.lyric-line.past{color:rgba(160,128,144,0.25);}
+.lyric-spacer{height:1.4rem;display:block;}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:1rem;margin:3rem 0;opacity:0.25;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--rose);}
+.divider span{font-size:1rem;}
+
+/* ── Love Letter ── */
+.love-letter{
+  margin-top:3rem;
+  padding:2.2rem 2rem;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:var(--card);
+  backdrop-filter:blur(4px);
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 1.2s ease,transform 1.2s ease;
+  pointer-events:none;
+}
+.love-letter.revealed{opacity:1;transform:translateY(0);pointer-events:all;}
+.love-letter .letter-label{
+  font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:1.2rem;display:block;
+}
+.love-letter p{
+  font-family:'Playfair Display',serif;
+  font-size:1.05rem;color:var(--muted);
+  line-height:1.9;font-style:italic;margin-bottom:0.8rem;
+}
+.love-letter p:last-child{margin-bottom:0;}
+.love-letter p strong{color:var(--rose);font-style:normal;}
+.hearts-row{margin-top:1.5rem;font-size:1.3rem;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+
+@media(max-width:480px){
+  .wrapper{padding:3rem 1.2rem 4rem;}
+  .vinyl-wrap{width:180px;height:180px;}
+  .vinyl{width:180px;height:180px;}
+  .needle{width:64px;height:64px;}
+}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="petals"></div>
+
+<audio id="song">
+  <source src="risk.mp3" type="audio/mpeg"/>
+</audio>
+
+<div class="wrapper">
+
+  <p class="label">🌹</p>
+  <h1 class="title"><span>Risk It All</span></h1>
+  <p class="artist">Bruno Mars &nbsp;·&nbsp;</p>
+  <p class="dedication">— for Paris, from Marky, with everything 🖤</p>
+
+  <!-- Disc -->
+  <div class="vinyl-wrap">
+    <div class="vinyl" id="vinyl" onclick="toggleSong()">
+      <div class="vinyl-photo" id="vinylPhoto">
+        <!-- ✏️ Just rename your photo file to paris.jpg and put it in the same folder! -->
+        <img src="paris.jpg" alt="Paris" onerror="this.style.display='none';document.getElementById('photoFallback').style.display='flex';">
+        <div class="vinyl-photo-placeholder" id="photoFallback" style="display:none;">
+          <span>📷</span>
+          <p style="font-size:0.65rem;color:var(--muted);">rename your photo to<br/><strong style="color:var(--rose)">paris.jpg</strong></p>
+        </div>
+      </div>
+      <div class="vinyl-hole"></div>
+      <div class="vinyl-shine"></div>
+    </div>
+
+    <!-- Needle arm -->
+    <div class="needle" id="needle">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="72" y1="8" x2="18" y2="72" stroke="#c2748e" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="72" cy="8" r="6" fill="#8b4a62" stroke="#c2748e" stroke-width="1.5"/>
+        <circle cx="18" cy="72" r="3.5" fill="#c2748e"/>
+      </svg>
+    </div>
+
+    <button class="play-btn" id="playBtn" onclick="event.stopPropagation();toggleSong()">▶</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-area">
+    <span class="time-label" id="timeElapsed">0:00</span>
+    <div class="progress-track" id="progressTrack" onclick="seekSong(event)">
+      <div class="progress-fill-bar" id="progressBar"></div>
+    </div>
+    <span class="time-label" id="timeDuration">3:24</span>
+  </div>
+
+  <p class="audio-note" id="audioNote">Put <strong style="color:var(--rose)">song.mp3</strong> in the same folder to play 🎵</p>
+
+  <!-- Lyrics -->
+  <div class="lyrics-wrap" id="lyricsWrap">
+    <span class="lyric-line" data-t="22.29">For just a chance to win your heart</span>
+    <span class="lyric-line" data-t="27.55">You could set the bar</span>
+    <span class="lyric-line" data-t="30.67">Beyond the stars</span>
+    <span class="lyric-line" data-t="33.64">I'll do anything, anything you ask me to</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line" data-t="43.71">Say you want the moon, watch me learn to fly</span>
+    <span class="lyric-line" data-t="49.04">Ain't a mountain you could point to I wouldn't climb</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line highlight" data-t="54.77">It's crazy, but it's true, there's nothing I won't do</span>
+    <span class="lyric-line highlight" data-t="60.49">I'd risk it all for you</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line" data-t="66.93">To hold your hand and call you mine</span>
+    <span class="lyric-line" data-t="72.20">I'm tryna be your man</span>
+    <span class="lyric-line" data-t="74.77">Till the end of time</span>
+    <span class="lyric-line" data-t="77.56">Oh, I'll do anything, anything you ask me to</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line" data-t="88.03">I would run through a fire just to be by your side</span>
+    <span class="lyric-line" data-t="94.19">If your heart's on the line, you could take mine</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line highlight" data-t="99.25">It's crazy, but it's true, there's nothing I won't do</span>
+    <span class="lyric-line highlight" data-t="105.12">I'd risk it all for you</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line" data-t="111.60">I would swim across the sea just to show you</span>
+    <span class="lyric-line" data-t="117.17">Sacrifice my life just to hold you</span>
+    <span class="lyric-line" data-t="122.20">I could go on and on to prove that you belong</span>
+    <span class="lyric-line" data-t="127.45">Here in my arms</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line" data-t="154.99">Say you want the moon, watch me learn to fly</span>
+    <span class="lyric-line" data-t="160.50">Ain't a mountain you could point to I wouldn't climb</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line highlight" data-t="166.00">It's crazy, but it's true, there's nothing I won't do</span>
+    <span class="lyric-line highlight" data-t="171.80">I'd risk it all for you</span>
+    <span class="lyric-spacer"></span>
+    <span class="lyric-line highlight" data-t="178.00">It's crazy, but it's true, there's nothing I won't do</span>
+    <span class="lyric-line highlight" data-t="183.80">I'd risk it all for you</span>
+  </div>
+
+  <div class="divider"><span>🌹</span></div>
+
+  <!-- Love Letter — fades in after song ends -->
+  <div class="love-letter" id="loveLetter">
+    <span class="letter-label">💌 A letter for you, Paris</span>
+    <p>
+      Hi, I just want to sincerely thank you for saying yes and allowing me to court you.<br/>
+      It really means a lot to me.
+    </p>
+    <p>
+      I appreciate your trust and the chance you're giving me to get to know you better.<br/>
+      I won't take it for granted, and I'll do my best to show you <strong>respect, effort, and consistency</strong> throughout this.
+    </p>
+    <p>
+      No pressure, no rush. I just genuinely want to make you feel comfortable and happy.
+    </p>
+    <p>
+      Thank you again for giving me this opportunity. 🤍
+    </p>
+    <p style="color:var(--rose);font-size:0.9rem;margin-top:1rem;">
+      — Marky 🖤
+    </p>
+    <div class="hearts-row">🌹 &nbsp; 🤍 &nbsp; 🌹</div>
+  </div>
+
+</div>
+
+<script>
+// Stars
+const starsEl = document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2.5+0.5;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+  starsEl.appendChild(s);
+}
+
+// Petals
+const petalsEl=document.getElementById('petals');
+const petalEmojis=['🌹','🌸','🌺','🥀'];
+for(let i=0;i<14;i++){
+  const p=document.createElement('div');p.className='rose-petal';
+  p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*12}s;font-size:${0.8+Math.random()*0.8}rem;`;
+  petalsEl.appendChild(p);
+}
+
+// LRC timestamps from official LRC file
+const LRC = [
+  [22.29, 0],[27.55,1],[30.67,2],[33.64,3],
+  [43.71,4],[49.04,5],
+  [54.77,6],[60.49,7],
+  [66.93,8],[72.20,9],[74.77,10],[77.56,11],
+  [88.03,12],[94.19,13],
+  [99.25,14],[105.12,15],
+  [111.60,16],[117.17,17],[122.20,18],[127.45,19],
+  [154.99,20],[160.50,21],
+  [166.00,22],[171.80,23],
+  [178.00,24],[183.80,25]
+];
+
+const lines = document.querySelectorAll('.lyric-line');
+const song  = document.getElementById('song');
+const vinyl = document.getElementById('vinyl');
+const needle= document.getElementById('needle');
+const playBtn=document.getElementById('playBtn');
+const progressBar=document.getElementById('progressBar');
+const timeElapsed=document.getElementById('timeElapsed');
+const timeDuration=document.getElementById('timeDuration');
+const audioNote=document.getElementById('audioNote');
+const loveLetter=document.getElementById('loveLetter');
+
+let playing=false;
+let syncInterval=null;
+let lastIdx=-1;
+let letterShown=false;
+
+function fmt(s){
+  const m=Math.floor(s/60);
+  const sec=Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+function updateLyrics(){
+  const t=song.currentTime;
+  const dur=song.duration||204;
+
+  // Progress bar
+  progressBar.style.width=((t/dur)*100)+'%';
+  timeElapsed.textContent=fmt(t);
+  if(!isNaN(dur)) timeDuration.textContent=fmt(dur);
+
+  // Active line
+  let activeIdx=-1;
+  for(let i=LRC.length-1;i>=0;i--){
+    if(t>=LRC[i][0]){activeIdx=LRC[i][1];break;}
+  }
+
+  if(activeIdx!==lastIdx){
+    lines.forEach((l,i)=>{
+      l.classList.remove('active','past');
+      if(i<activeIdx) l.classList.add('past');
+    });
+    if(activeIdx>=0&&lines[activeIdx]){
+      lines[activeIdx].classList.add('active');
+      lines[activeIdx].scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    lastIdx=activeIdx;
+
+    if(t<22){
+      const rem=Math.ceil(22-t);
+      audioNote.innerHTML=`🎷 Intro... vocals in <strong style="color:var(--rose)">${rem}s</strong>`;
+    } else if(t<130){
+      audioNote.innerHTML=`🎤 <strong style="color:var(--rose)">Bruno is singing for you, Paris...</strong> 🌹`;
+    } else {
+      audioNote.innerHTML=`🎤 <strong style="color:var(--rose)">Almost there...</strong> 🌹`;
+    }
+  }
+}
+
+function toggleSong(){
+  if(playing){
+    song.pause();
+    vinyl.classList.remove('playing');
+    needle.classList.remove('playing');
+    playBtn.textContent='▶';
+    clearInterval(syncInterval);
+    playing=false;
+  } else {
+    song.play().catch(()=>{
+      audioNote.innerHTML=`⚠️ Place <strong style="color:var(--rose)">song.mp3</strong> in the same folder first!`;
+    });
+    vinyl.classList.add('playing');
+    needle.classList.add('playing');
+    playBtn.textContent='⏸';
+    playing=true;
+    syncInterval=setInterval(updateLyrics,200);
+  }
+}
+
+function seekSong(e){
+  const track=document.getElementById('progressTrack');
+  const rect=track.getBoundingClientRect();
+  const ratio=(e.clientX-rect.left)/rect.width;
+  const dur=song.duration||204;
+  song.currentTime=ratio*dur;
+  lastIdx=-1;
+  updateLyrics();
+}
+
+// Song ended — reveal love letter
+song.addEventListener('ended',()=>{
+  vinyl.classList.remove('playing');
+  needle.classList.remove('playing');
+  playBtn.textContent='▶';
+  clearInterval(syncInterval);
+  playing=false;
+  lines.forEach(l=>l.classList.remove('active'));
+
+  if(!letterShown){
+    letterShown=true;
+    setTimeout(()=>{
+      loveLetter.classList.add('revealed');
+      loveLetter.scrollIntoView({behavior:'smooth',block:'center'});
+    },800);
+  }
+
+  audioNote.innerHTML=`🌹 <strong style="color:var(--rose)">The end... or just the beginning.</strong>`;
+});
+
+// Idle shimmer when not playing
+let idleIdx=0;
+setInterval(()=>{
+  if(playing) return;
+  lines.forEach(l=>l.classList.remove('active'));
+  lines[idleIdx]&&lines[idleIdx].classList.add('active');
+  idleIdx=(idleIdx+1)%lines.length;
+},3500);
+</script>
+</body>
+</html>
