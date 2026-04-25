@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Our Photobooth 📷</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080508;
+  --rose:#c2748e;
+  --deep:#7a3352;
+  --gold:#c9a86c;
+  --text:#f0e6ea;
+  --muted:#8a7080;
+  --border:rgba(194,116,142,0.2);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 15%,rgba(122,51,82,0.2) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 85%,rgba(194,116,142,0.1) 0%,transparent 65%);}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.05;}50%{opacity:0.5;}}
+
+.petal{position:fixed;z-index:0;pointer-events:none;opacity:0;animation:petalFall linear infinite;}
+@keyframes petalFall{0%{transform:translateY(-5vh) rotate(0deg);opacity:0;}8%{opacity:0.3;}92%{opacity:0.1;}100%{transform:translateY(108vh) rotate(400deg) translateX(30px);opacity:0;}}
+
+/* Layout */
+.wrapper{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:3rem 1.5rem 6rem;text-align:center;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:2.5rem;transition:color 0.2s;}
+.back-btn:hover{color:var(--rose);}
+.eyebrow{font-size:0.65rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--rose);margin-bottom:0.6rem;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,7vw,4.5rem);font-weight:300;line-height:1;color:var(--text);margin-bottom:0.5rem;}
+.page-title em{font-style:italic;color:var(--rose);}
+.page-sub{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--muted);margin-bottom:3rem;line-height:1.7;}
+
+/* Main columns */
+.studio{display:grid;grid-template-columns:1fr auto;gap:2.5rem;align-items:start;}
+@media(max-width:680px){.studio{grid-template-columns:1fr;}}
+
+/* Camera side */
+.camera-side{display:flex;flex-direction:column;gap:1.2rem;}
+
+/* Viewfinder */
+.viewfinder-wrap{position:relative;border-radius:16px;overflow:hidden;background:#0a0508;border:1px solid var(--border);aspect-ratio:4/3;}
+#video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
+.vf-overlay{position:absolute;inset:0;pointer-events:none;}
+.vf-corner{position:absolute;width:20px;height:20px;border-color:var(--rose);border-style:solid;opacity:0.6;}
+.vf-corner.tl{top:10px;left:10px;border-width:2px 0 0 2px;}
+.vf-corner.tr{top:10px;right:10px;border-width:2px 2px 0 0;}
+.vf-corner.bl{bottom:10px;left:10px;border-width:0 0 2px 2px;}
+.vf-corner.br{bottom:10px;right:10px;border-width:0 2px 2px 0;}
+
+/* Flash */
+.flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;transition:opacity 0.05s;}
+.flash.go{opacity:1;}
+
+/* Countdown overlay */
+.countdown-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(8,5,8,0.55);opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.countdown-overlay.show{opacity:1;}
+.countdown-num{
+  font-family:'Cormorant Garamond',serif;font-size:7rem;font-weight:300;
+  color:white;text-shadow:0 0 40px rgba(194,116,142,0.8);
+  animation:popNum 0.4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popNum{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* Shot counter */
+.shot-counter{
+  position:absolute;top:12px;right:14px;
+  font-size:0.7rem;letter-spacing:0.12em;color:var(--rose);
+  background:rgba(8,5,8,0.6);padding:4px 10px;border-radius:99px;
+  border:0.5px solid var(--border);
+}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.filter-btn{
+  background:rgba(255,255,255,0.04);border:0.5px solid var(--border);
+  border-radius:99px;padding:5px 14px;font-size:0.72rem;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;
+}
+.filter-btn:hover{border-color:var(--rose);color:var(--rose);}
+.filter-btn.active{background:rgba(194,116,142,0.15);border-color:var(--rose);color:var(--rose);}
+
+/* Controls */
+.controls{display:flex;gap:1rem;justify-content:center;align-items:center;flex-wrap:wrap;}
+.shutter-btn{
+  background:linear-gradient(135deg,var(--rose),var(--deep));
+  border:none;border-radius:50%;width:64px;height:64px;
+  cursor:pointer;font-size:1.5rem;
+  box-shadow:0 4px 24px rgba(194,116,142,0.4);
+  transition:transform 0.2s,box-shadow 0.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.shutter-btn:hover{transform:scale(1.08);box-shadow:0 8px 32px rgba(194,116,142,0.55);}
+.shutter-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.retake-btn,.camera-select{
+  background:rgba(255,255,255,0.04);border:0.5px solid var(--border);
+  border-radius:10px;padding:8px 16px;font-size:0.78rem;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.retake-btn:hover,.camera-select:hover{border-color:var(--rose);color:var(--rose);}
+.camera-select option{background:#0a0508;color:var(--text);}
+
+/* Status */
+.status-msg{font-size:0.78rem;color:var(--muted);font-style:italic;min-height:1.2rem;}
+.status-msg.highlight{color:var(--rose);}
+
+/* ── Strip side ── */
+.strip-side{display:flex;flex-direction:column;align-items:center;gap:1.2rem;}
+
+/* The actual strip */
+.strip-wrap{
+  background:#0d0508;
+  border:1px solid rgba(194,116,142,0.25);
+  border-radius:6px;
+  padding:14px 12px;
+  width:190px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;
+  gap:0;
+  position:relative;
+}
+
+/* Strip header */
+.strip-header{
+  text-align:center;padding:6px 0 10px;
+  border-bottom:0.5px solid rgba(194,116,142,0.2);
+  margin-bottom:10px;
+}
+.strip-header-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:0.9rem;font-style:italic;color:var(--rose);
+  letter-spacing:0.05em;
+}
+.strip-header-sub{font-size:0.55rem;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+/* Strip frames */
+.strip-frames{display:flex;flex-direction:column;gap:6px;}
+.strip-frame{
+  width:100%;aspect-ratio:4/3;
+  background:#1a0a14;
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.strip-frame img{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
+.strip-frame-empty{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;
+}
+.strip-frame-empty span{font-size:1.2rem;opacity:0.25;}
+.strip-frame-empty p{font-size:0.55rem;color:var(--muted);opacity:0.5;letter-spacing:0.08em;}
+.frame-num{
+  position:absolute;top:4px;left:5px;
+  font-size:0.5rem;color:rgba(194,116,142,0.5);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Strip footer */
+.strip-footer{
+  text-align:center;padding:10px 0 4px;
+  border-top:0.5px solid rgba(194,116,142,0.2);
+  margin-top:10px;
+}
+.strip-footer-names{
+  font-family:'Cormorant Garamond',serif;
+  font-size:0.85rem;font-style:italic;color:var(--rose);
+}
+.strip-footer-date{font-size:0.52rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+.strip-hearts{font-size:0.75rem;margin-top:4px;opacity:0.6;}
+
+/* Deco on strip */
+.strip-deco{
+  position:absolute;
+  pointer-events:none;font-size:0.75rem;opacity:0.35;
+}
+
+/* Download btn */
+.download-btn{
+  background:linear-gradient(135deg,var(--rose),var(--deep));
+  border:none;border-radius:12px;
+  padding:10px 24px;font-size:0.82rem;
+  color:white;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 18px rgba(194,116,142,0.3);
+  transition:all 0.25s;width:100%;
+  display:none;
+}
+.download-btn.show{display:block;}
+.download-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(194,116,142,0.45);}
+.reset-btn{
+  background:transparent;border:0.5px solid var(--border);border-radius:12px;
+  padding:8px 20px;font-size:0.75rem;color:var(--muted);
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all 0.2s;width:100%;display:none;
+}
+.reset-btn.show{display:block;}
+.reset-btn:hover{border-color:var(--rose);color:var(--rose);}
+
+/* Permission screen */
+.permission-screen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;padding:3rem 1rem;
+  border:0.5px dashed var(--border);border-radius:16px;
+  min-height:280px;
+}
+.permission-screen p{color:var(--muted);font-size:0.88rem;line-height:1.6;max-width:280px;text-align:center;}
+.allow-btn{
+  background:linear-gradient(135deg,var(--rose),var(--deep));
+  border:none;border-radius:12px;padding:10px 28px;
+  font-size:0.88rem;color:white;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 18px rgba(194,116,142,0.3);
+  transition:all 0.2s;
+}
+.allow-btn:hover{transform:translateY(-2px);}
+
+/* Hidden canvas */
+#snapCanvas{display:none;}
+
+@media(max-width:480px){
+  .strip-wrap{width:160px;}
+  .shutter-btn{width:56px;height:56px;font-size:1.3rem;}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div id="stars"></div>
+<div id="petals"></div>
+<canvas id="snapCanvas"></canvas>
+
+<div class="wrapper">
+  <a class="back-btn" href="photobooth.html">← Back to Album</a>
+  <p class="eyebrow">Marky & Paris</p>
+  <h1 class="page-title">Live <em>Photobooth</em></h1>
+  <p class="page-sub">4 shots. 1 strip.🖤</p>
+
+  <div class="studio">
+
+    <!-- Camera side -->
+    <div class="camera-side">
+
+      <!-- Permission screen -->
+      <div class="permission-screen" id="permScreen">
+        <span style="font-size:3rem;">📷</span>
+        <p>Allow camera access to start your photobooth session with Paris.</p>
+        <button class="allow-btn" onclick="startCamera()">Allow Camera</button>
+      </div>
+
+      <!-- Viewfinder (hidden until camera starts) -->
+      <div class="viewfinder-wrap" id="viewfinderWrap" style="display:none;">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="vf-overlay">
+          <div class="vf-corner tl"></div>
+          <div class="vf-corner tr"></div>
+          <div class="vf-corner bl"></div>
+          <div class="vf-corner br"></div>
+        </div>
+        <div class="shot-counter" id="shotCounter">0 / 4</div>
+        <div class="flash" id="flash"></div>
+        <div class="countdown-overlay" id="cdOverlay">
+          <div class="countdown-num" id="cdNum">3</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar" id="filterBar" style="display:none;">
+        <button class="filter-btn active" onclick="setFilter('none',this)">Original</button>
+        <button class="filter-btn" onclick="setFilter('grayscale(100%)',this)">B&W</button>
+        <button class="filter-btn" onclick="setFilter('sepia(70%) saturate(1.2)',this)">Warm</button>
+        <button class="filter-btn" onclick="setFilter('saturate(0.6) brightness(0.9) contrast(1.1)',this)">Faded</button>
+        <button class="filter-btn" onclick="setFilter('contrast(1.15) saturate(1.3) brightness(0.88)',this)">Cinematic</button>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls" id="controls" style="display:none;">
+        <button class="retake-btn" id="retakeBtn" onclick="retakeLast()" style="display:none;">↩ Retake</button>
+        <button class="shutter-btn" id="shutterBtn" onclick="startCountdown()" title="Take Photo">📷</button>
+        <select class="camera-select" id="camSelect" onchange="switchCamera()" title="Switch Camera">
+          <option value="">📷 Camera</option>
+        </select>
+      </div>
+
+      <p class="status-msg" id="statusMsg">Starting camera...</p>
+    </div>
+
+    <!-- Strip side -->
+    <div class="strip-side">
+      <div class="strip-wrap" id="stripWrap">
+        <!-- Deco -->
+        <span class="strip-deco" style="top:6px;right:8px;">🌹</span>
+        <span class="strip-deco" style="bottom:38px;left:6px;">🥀</span>
+        <span class="strip-deco" style="bottom:38px;right:8px;">🖤</span>
+
+        <div class="strip-header">
+          <div class="strip-header-title">Marky & Paris</div>
+          <div class="strip-header-sub">Our Photobooth</div>
+        </div>
+
+        <div class="strip-frames" id="stripFrames">
+          <div class="strip-frame" id="frame0"><div class="strip-frame-empty"><span>🌹</span><p>shot 1</p></div><span class="frame-num">01</span></div>
+          <div class="strip-frame" id="frame1"><div class="strip-frame-empty"><span>🌹</span><p>shot 2</p></div><span class="frame-num">02</span></div>
+          <div class="strip-frame" id="frame2"><div class="strip-frame-empty"><span>🌹</span><p>shot 3</p></div><span class="frame-num">03</span></div>
+          <div class="strip-frame" id="frame3"><div class="strip-frame-empty"><span>🌹</span><p>shot 4</p></div><span class="frame-num">04</span></div>
+        </div>
+
+        <div class="strip-footer">
+          <div class="strip-footer-names">Paris & Marky</div>
+          <div class="strip-footer-date" id="stripDate"></div>
+          <div class="strip-hearts">🌹 🖤 🌹</div>
+        </div>
+      </div>
+
+      <button class="download-btn" id="downloadBtn" onclick="downloadStrip()">⬇ Save Strip</button>
+      <button class="reset-btn" id="resetBtn" onclick="resetStrip()">↩ Start Over</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// Stars
+const starsEl=document.getElementById('stars');
+for(let i=0;i<100;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2+0.4;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*6}s;`;
+  starsEl.appendChild(s);
+}
+// Petals
+const petalsEl=document.getElementById('petals');
+const petalEmojis=['🌹','🥀','🌸'];
+for(let i=0;i<10;i++){
+  const p=document.createElement('div');p.className='petal';
+  p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${12+Math.random()*16}s;animation-delay:${Math.random()*14}s;font-size:${0.7+Math.random()*0.8}rem;`;
+  petalsEl.appendChild(p);
+}
+
+// Set today's date on strip
+const now = new Date();
+document.getElementById('stripDate').textContent =
+  now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+
+let stream = null;
+let shots = [];
+let currentFilter = 'none';
+let isShooting = false;
+
+async function startCamera(){
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}},audio:false});
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+    document.getElementById('permScreen').style.display='none';
+    document.getElementById('viewfinderWrap').style.display='block';
+    document.getElementById('filterBar').style.display='flex';
+    document.getElementById('controls').style.display='flex';
+    setStatus('Ready! Hit 📷 to take your first shot.','');
+    populateCameras();
+  } catch(e){
+    setStatus('Camera access denied. Please allow camera in your browser.','highlight');
+  }
+}
+
+async function populateCameras(){
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d=>d.kind==='videoinput');
+    const sel = document.getElementById('camSelect');
+    sel.innerHTML='';
+    cams.forEach((cam,i)=>{
+      const opt=document.createElement('option');
+      opt.value=cam.deviceId;
+      opt.textContent=cam.label||`Camera ${i+1}`;
+      sel.appendChild(opt);
+    });
+  } catch(e){}
+}
+
+async function switchCamera(){
+  const sel=document.getElementById('camSelect');
+  const deviceId=sel.value;
+  if(!deviceId) return;
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  try {
+    stream=await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:deviceId}},audio:false});
+    document.getElementById('video').srcObject=stream;
+    await document.getElementById('video').play();
+  } catch(e){}
+}
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.getElementById('video').style.filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function startCountdown(){
+  if(isShooting||shots.length>=4) return;
+  isShooting=true;
+  document.getElementById('shutterBtn').disabled=true;
+  document.getElementById('retakeBtn').style.display='none';
+  const overlay=document.getElementById('cdOverlay');
+  const numEl=document.getElementById('cdNum');
+  overlay.classList.add('show');
+  let count=3;
+  numEl.textContent=count;
+  setStatus(`Get ready... ${count}`, 'highlight');
+
+  const tick=setInterval(()=>{
+    count--;
+    if(count>0){
+      numEl.style.animation='none';
+      numEl.offsetHeight;
+      numEl.style.animation='popNum 0.4s cubic-bezier(.34,1.56,.64,1) both';
+      numEl.textContent=count;
+      setStatus(`Get ready... ${count}`,'highlight');
+    } else {
+      clearInterval(tick);
+      overlay.classList.remove('show');
+      takeShot();
+    }
+  },1000);
+}
+
+function takeShot(){
+  const video=document.getElementById('video');
+  const canvas=document.getElementById('snapCanvas');
+  canvas.width=video.videoWidth||640;
+  canvas.height=video.videoHeight||480;
+  const ctx=canvas.getContext('2d');
+  ctx.filter=currentFilter==='none'?'none':currentFilter;
+  ctx.translate(canvas.width,0);
+  ctx.scale(-1,1);
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+
+  // Flash
+  const flash=document.getElementById('flash');
+  flash.classList.add('go');
+  setTimeout(()=>flash.classList.remove('go'),120);
+
+  const dataUrl=canvas.toDataURL('image/jpeg',0.92);
+  shots.push(dataUrl);
+
+  // Update strip frame
+  const frameIdx=shots.length-1;
+  const frame=document.getElementById(`frame${frameIdx}`);
+  frame.innerHTML=`<img src="${dataUrl}" alt="Shot ${frameIdx+1}"><span class="frame-num">0${frameIdx+1}</span>`;
+
+  document.getElementById('shotCounter').textContent=`${shots.length} / 4`;
+
+  isShooting=false;
+
+  if(shots.length<4){
+    document.getElementById('shutterBtn').disabled=false;
+    document.getElementById('retakeBtn').style.display='block';
+    setStatus(`Shot ${shots.length} done! ${4-shots.length} more to go 🌹`,'highlight');
+  } else {
+    document.getElementById('shutterBtn').disabled=true;
+    document.getElementById('retakeBtn').style.display='none';
+    document.getElementById('downloadBtn').classList.add('show');
+    document.getElementById('resetBtn').classList.add('show');
+    setStatus('All 4 shots done! Save your strip 🖤','highlight');
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+  }
+}
+
+function retakeLast(){
+  if(shots.length===0) return;
+  shots.pop();
+  const idx=shots.length;
+  const frame=document.getElementById(`frame${idx}`);
+  frame.innerHTML=`<div class="strip-frame-empty"><span>🌹</span><p>shot ${idx+1}</p></div><span class="frame-num">0${idx+1}</span>`;
+  document.getElementById('shotCounter').textContent=`${shots.length} / 4`;
+  document.getElementById('shutterBtn').disabled=false;
+  if(shots.length===0) document.getElementById('retakeBtn').style.display='none';
+  setStatus(`Retaken! Take shot ${shots.length+1} again.`,'');
+}
+
+function resetStrip(){
+  shots=[];
+  for(let i=0;i<4;i++){
+    const frame=document.getElementById(`frame${i}`);
+    frame.innerHTML=`<div class="strip-frame-empty"><span>🌹</span><p>shot ${i+1}</p></div><span class="frame-num">0${i+1}</span>`;
+  }
+  document.getElementById('shotCounter').textContent='0 / 4';
+  document.getElementById('shutterBtn').disabled=false;
+  document.getElementById('retakeBtn').style.display='none';
+  document.getElementById('downloadBtn').classList.remove('show');
+  document.getElementById('resetBtn').classList.remove('show');
+  setStatus('Ready for a new strip! Hit 📷','');
+  // Restart camera
+  startCamera();
+}
+
+async function downloadStrip(){
+  const strip=document.getElementById('stripWrap');
+  try {
+    const canvas=await html2canvas(strip,{
+      backgroundColor:'#0d0508',
+      scale:3,
+      useCORS:true,
+      logging:false
+    });
+    const link=document.createElement('a');
+    link.download=`paris-marky-photobooth-${Date.now()}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  } catch(e){
+    setStatus('Download failed — try right-clicking the strip and saving.','highlight');
+  }
+}
+
+function setStatus(msg,cls){
+  const el=document.getElementById('statusMsg');
+  el.textContent=msg;
+  el.className='status-msg'+(cls?' '+cls:'');
+}
+</script>
+</body>
+</html>

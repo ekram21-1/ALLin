@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Our Photobooth 🖤</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080508;
+  --rose:#c2748e;
+  --deep:#7a3352;
+  --gold:#c9a86c;
+  --text:#f0e6ea;
+  --muted:#8a7080;
+  --border:rgba(194,116,142,0.15);
+}
+
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Background */
+.bg-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 15%, rgba(122,51,82,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 85%, rgba(194,116,142,0.1) 0%, transparent 65%);
+}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.05;}50%{opacity:0.55;}}
+
+.petal{position:fixed;z-index:0;pointer-events:none;opacity:0;animation:petalFall linear infinite;}
+@keyframes petalFall{
+  0%{transform:translateY(-5vh) rotate(0deg);opacity:0;}
+  8%{opacity:0.3;}92%{opacity:0.1;}
+  100%{transform:translateY(108vh) rotate(400deg) translateX(30px);opacity:0;}
+}
+
+/* Wrapper */
+.wrapper{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:5rem 2rem 7rem;text-align:center;}
+
+/* Header */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  margin-bottom:3.5rem;
+  transition:color 0.2s;
+}
+.back-btn:hover{color:var(--rose);}
+
+.eyebrow{font-size:0.65rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--rose);margin-bottom:0.8rem;}
+.page-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.8rem,8vw,5.5rem);
+  font-weight:300;line-height:1;
+  color:var(--text);margin-bottom:0.5rem;
+}
+.page-title em{font-style:italic;color:var(--rose);}
+.page-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.05rem;font-style:italic;
+  color:var(--muted);margin-bottom:4rem;line-height:1.7;
+}
+
+/* Polaroid Grid */
+.polaroid-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:2.5rem 2rem;
+  margin-bottom:5rem;
+}
+
+.polaroid{
+  background:#0f0b10;
+  border:0.5px solid rgba(194,116,142,0.2);
+  border-radius:4px;
+  padding:14px 14px 52px;
+  width:220px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.5),
+    0 2px 8px rgba(0,0,0,0.3),
+    inset 0 0 0 0.5px rgba(255,255,255,0.03);
+  animation:fadeUp 0.8s ease forwards;
+  opacity:0;
+  transition:transform 0.4s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+  cursor:default;
+  position:relative;
+}
+.polaroid:nth-child(1){animation-delay:0.1s; transform:rotate(-2.5deg);}
+.polaroid:nth-child(2){animation-delay:0.25s; transform:rotate(1.8deg);}
+.polaroid:nth-child(3){animation-delay:0.4s;  transform:rotate(-1.2deg);}
+.polaroid:nth-child(4){animation-delay:0.55s; transform:rotate(2.2deg);}
+
+.polaroid:hover{
+  transform:rotate(0deg) translateY(-10px) scale(1.04) !important;
+  box-shadow:0 24px 60px rgba(122,51,82,0.4), 0 8px 24px rgba(0,0,0,0.5);
+  z-index:10;
+}
+
+/* Photo inside polaroid */
+.polaroid-img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+  border-radius:2px;
+  filter:brightness(0.9) saturate(0.95) contrast(1.05);
+}
+
+/* Placeholder */
+.polaroid-placeholder{
+  width:100%;aspect-ratio:1/1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a0a14,#100810);
+  border-radius:2px;gap:8px;
+  border:1px dashed rgba(194,116,142,0.2);
+}
+.polaroid-placeholder span{font-size:2rem;opacity:0.5;}
+.polaroid-placeholder p{font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;}
+
+/* Caption */
+.polaroid-caption{
+  position:absolute;
+  bottom:12px;left:0;right:0;
+  text-align:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:0.85rem;font-style:italic;
+  color:rgba(194,116,142,0.7);
+  padding:0 10px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* Adding more note */
+.add-note{
+  display:inline-flex;align-items:center;gap:10px;
+  border:0.5px dashed rgba(194,116,142,0.25);
+  border-radius:16px;
+  padding:1rem 1.8rem;
+  font-size:0.78rem;color:var(--muted);
+  font-style:italic;margin-bottom:5rem;
+  line-height:1.6;
+}
+.add-note strong{color:var(--rose);font-style:normal;}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:1.2rem;opacity:0.2;margin:0 auto 4rem;max-width:400px;}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--rose);}
+
+/* Footer note */
+.footer-note{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,2.5vw,1.2rem);
+  font-style:italic;color:var(--muted);
+  line-height:1.9;
+}
+.footer-note strong{color:var(--rose);font-style:normal;}
+.hearts{margin-top:1.5rem;font-size:1.4rem;animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px) rotate(var(--r,0deg));}
+  to{opacity:1;}
+}
+
+@media(max-width:520px){
+  .polaroid{width:155px;padding:10px 10px 42px;}
+  .polaroid-caption{font-size:0.72rem;bottom:9px;}
+  .polaroid-grid{gap:1.8rem 1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div id="stars"></div>
+<div id="petals"></div>
+
+<div class="wrapper">
+
+  <a class="back-btn" href="index.html">← Back to Home</a>
+
+  <p class="eyebrow">Marky & Paris</p>
+  <h1 class="page-title">Our <em>Photobooth</em></h1>
+  <p class="page-sub">Every frame, a memory. Every smile, a reason. 🖤</p>
+
+  <!-- ✏️ TO ADD MORE PHOTOS: copy a <div class="polaroid"> block and change the src and caption -->
+  <div class="polaroid-grid" id="grid">
+
+    <!-- Photo 1 -->
+    <div class="polaroid">
+      <img class="polaroid-img" src="pb1.png" alt="Us"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="polaroid-placeholder" style="display:none;">
+        <span>📷</span>
+        <p>photo1.jpg</p>
+      </div>
+      <span class="polaroid-caption">April 26🖤</span>
+    </div>
+
+    <!-- Photo 2 -->
+    <div class="polaroid">
+      <img class="polaroid-img" src="pb2.png" alt="Us"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="polaroid-placeholder" style="display:none;">
+        <span>📷</span>
+        <p>photo2.jpg</p>
+      </div>
+      <span class="polaroid-caption">April 26🌹</span>
+    </div>
+
+    <!-- ✏️ COPY FROM HERE to add a new photo after your next date -->
+    <!--
+    <div class="polaroid">
+      <img class="polaroid-img" src="photo3.jpg" alt="Us"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="polaroid-placeholder" style="display:none;">
+        <span>📷</span>
+        <p>photo3.jpg</p>
+      </div>
+      <span class="polaroid-caption">your caption here 🌸</span>
+    </div>
+    -->
+
+  </div>
+
+  <div class="add-note">
+    <span>🗓️</span>
+    <span>More photos coming soon — after our next date.<br/>
+    To add: save as <strong>photo3.jpg</strong>, uncomment the block above.</span>
+  </div>
+
+  <div class="divider"><span>🖤</span></div>
+
+  <p class="footer-note">
+    Every photobooth we step into,<br/>
+    every frame we share —<br/>
+    <strong>I want them all to be with you.</strong>
+  </p>
+  <div class="hearts">🖤 &nbsp; 🌹 &nbsp; 🖤</div>
+
+</div>
+
+<script>
+// Stars
+const starsEl=document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2+0.4;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*6}s;`;
+  starsEl.appendChild(s);
+}
+
+// Petals
+const petalsEl=document.getElementById('petals');
+const emojis=['🌹','🥀','🌸'];
+for(let i=0;i<12;i++){
+  const p=document.createElement('div');p.className='petal';
+  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${12+Math.random()*16}s;animation-delay:${Math.random()*14}s;font-size:${0.7+Math.random()*0.9}rem;`;
+  petalsEl.appendChild(p);
+}
+</script>
+</body>
+</html>
