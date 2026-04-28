@@ -26,7 +26,6 @@ body{
   overflow-x:hidden;
 }
 
-/* Background */
 .bg-layer{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -44,10 +43,27 @@ body{
   100%{transform:translateY(108vh) rotate(400deg) translateX(30px);opacity:0;}
 }
 
-/* Wrapper */
-.wrapper{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:5rem 2rem 7rem;text-align:center;}
+/* ── Timer Banner ── */
+.timer-banner{
+  position:relative;z-index:2;
+  text-align:center;
+  padding:1.6rem 1rem 0.8rem;
+}
+.timer-label{
+  font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:0.5rem;
+}
+.timer-display{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,3.5vw,1.5rem);
+  font-weight:300;color:var(--text);
+  letter-spacing:0.06em;
+}
+.timer-display span{color:var(--rose);}
 
-/* Header */
+/* ── Wrapper ── */
+.wrapper{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:3rem 2rem 7rem;text-align:center;}
+
 .back-btn{
   display:inline-flex;align-items:center;gap:6px;
   font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;
@@ -71,13 +87,10 @@ body{
   color:var(--muted);margin-bottom:4rem;line-height:1.7;
 }
 
-/* Polaroid Grid */
+/* ── Polaroid Grid ── */
 .polaroid-grid{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:2.5rem 2rem;
-  margin-bottom:5rem;
+  display:flex;flex-wrap:wrap;justify-content:center;
+  gap:2.5rem 2rem;margin-bottom:5rem;
 }
 
 .polaroid{
@@ -86,20 +99,17 @@ body{
   border-radius:4px;
   padding:14px 14px 52px;
   width:220px;
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.5),
-    0 2px 8px rgba(0,0,0,0.3),
-    inset 0 0 0 0.5px rgba(255,255,255,0.03);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 2px 8px rgba(0,0,0,0.3),inset 0 0 0 0.5px rgba(255,255,255,0.03);
   animation:fadeUp 0.8s ease forwards;
   opacity:0;
   transition:transform 0.4s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
-  cursor:default;
+  cursor:zoom-in;
   position:relative;
 }
 .polaroid:nth-child(1){animation-delay:0.1s; transform:rotate(-2.5deg);}
-.polaroid:nth-child(2){animation-delay:0.25s; transform:rotate(1.8deg);}
-.polaroid:nth-child(3){animation-delay:0.4s;  transform:rotate(-1.2deg);}
-.polaroid:nth-child(4){animation-delay:0.55s; transform:rotate(2.2deg);}
+.polaroid:nth-child(2){animation-delay:0.25s;transform:rotate(1.8deg);}
+.polaroid:nth-child(3){animation-delay:0.4s; transform:rotate(-1.2deg);}
+.polaroid:nth-child(4){animation-delay:0.55s;transform:rotate(2.2deg);}
 
 .polaroid:hover{
   transform:rotate(0deg) translateY(-10px) scale(1.04) !important;
@@ -107,17 +117,12 @@ body{
   z-index:10;
 }
 
-/* Photo inside polaroid */
 .polaroid-img{
-  width:100%;
-  aspect-ratio:1/1;
-  object-fit:cover;
-  display:block;
+  width:100%;aspect-ratio:1/1;object-fit:cover;display:block;
   border-radius:2px;
   filter:brightness(0.9) saturate(0.95) contrast(1.05);
 }
 
-/* Placeholder */
 .polaroid-placeholder{
   width:100%;aspect-ratio:1/1;
   display:flex;flex-direction:column;
@@ -129,10 +134,8 @@ body{
 .polaroid-placeholder span{font-size:2rem;opacity:0.5;}
 .polaroid-placeholder p{font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;}
 
-/* Caption */
 .polaroid-caption{
-  position:absolute;
-  bottom:12px;left:0;right:0;
+  position:absolute;bottom:12px;left:0;right:0;
   text-align:center;
   font-family:'Cormorant Garamond',serif;
   font-size:0.85rem;font-style:italic;
@@ -141,35 +144,73 @@ body{
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
-/* Adding more note */
+/* ── Lightbox ── */
+.lightbox{
+  display:none;
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,5,8,0.96);
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:1rem;
+}
+.lightbox.open{display:flex;animation:lbIn 0.25s ease;}
+@keyframes lbIn{from{opacity:0;}to{opacity:1;}}
+
+.lightbox-img{
+  max-width:min(88vw,560px);
+  max-height:78vh;
+  object-fit:contain;
+  border-radius:4px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.8);
+  border:0.5px solid rgba(194,116,142,0.25);
+}
+.lightbox-caption{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;font-style:italic;
+  color:rgba(194,116,142,0.75);
+  letter-spacing:0.05em;
+}
+.lightbox-close{
+  position:fixed;top:1.4rem;right:1.8rem;
+  font-size:1.6rem;color:var(--muted);
+  background:none;border:none;cursor:pointer;
+  transition:color 0.2s;line-height:1;
+  z-index:1001;
+}
+.lightbox-close:hover{color:var(--rose);}
+.lightbox-nav{
+  display:flex;gap:2rem;margin-top:0.2rem;
+}
+.lightbox-nav button{
+  background:none;border:0.5px solid rgba(194,116,142,0.25);
+  border-radius:50%;width:38px;height:38px;
+  color:var(--rose);font-size:1.1rem;cursor:pointer;
+  transition:background 0.2s,border-color 0.2s;
+}
+.lightbox-nav button:hover{background:rgba(194,116,142,0.1);border-color:var(--rose);}
+
+/* ── Rest ── */
 .add-note{
   display:inline-flex;align-items:center;gap:10px;
-  border:0.5px dashed rgba(194,116,142,0.25);
-  border-radius:16px;
-  padding:1rem 1.8rem;
-  font-size:0.78rem;color:var(--muted);
-  font-style:italic;margin-bottom:5rem;
-  line-height:1.6;
+  border:0.5px dashed rgba(194,116,142,0.25);border-radius:16px;
+  padding:1rem 1.8rem;font-size:0.78rem;color:var(--muted);
+  font-style:italic;margin-bottom:5rem;line-height:1.6;
 }
 .add-note strong{color:var(--rose);font-style:normal;}
 
-/* Divider */
 .divider{display:flex;align-items:center;gap:1.2rem;opacity:0.2;margin:0 auto 4rem;max-width:400px;}
 .divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--rose);}
 
-/* Footer note */
 .footer-note{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(1rem,2.5vw,1.2rem);
-  font-style:italic;color:var(--muted);
-  line-height:1.9;
+  font-size:clamp(1rem,2.5vw,1.2rem);font-style:italic;
+  color:var(--muted);line-height:1.9;
 }
 .footer-note strong{color:var(--rose);font-style:normal;}
 .hearts{margin-top:1.5rem;font-size:1.4rem;animation:pulse 2.5s ease-in-out infinite;}
 @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
 
 @keyframes fadeUp{
-  from{opacity:0;transform:translateY(28px) rotate(var(--r,0deg));}
+  from{opacity:0;transform:translateY(28px);}
   to{opacity:1;}
 }
 
@@ -177,6 +218,7 @@ body{
   .polaroid{width:155px;padding:10px 10px 42px;}
   .polaroid-caption{font-size:0.72rem;bottom:9px;}
   .polaroid-grid{gap:1.8rem 1.2rem;}
+  .timer-display{font-size:0.88rem;}
 }
 </style>
 </head>
@@ -186,6 +228,12 @@ body{
 <div id="stars"></div>
 <div id="petals"></div>
 
+<!-- ── Timer ── -->
+<div class="timer-banner">
+  <p class="timer-label">we've been talking for</p>
+  <p class="timer-display" id="timer">—</p>
+</div>
+
 <div class="wrapper">
 
   <a class="back-btn" href="index.html">← Back to Home</a>
@@ -194,52 +242,36 @@ body{
   <h1 class="page-title">Our <em>Photobooth</em></h1>
   <p class="page-sub">Every frame, a memory. Every smile, a reason. 🖤</p>
 
-  <!-- ✏️ TO ADD MORE PHOTOS: copy a <div class="polaroid"> block and change the src and caption -->
   <div class="polaroid-grid" id="grid">
 
-    <!-- Photo 1 -->
-    <div class="polaroid">
+    <div class="polaroid" data-src="pb1.png" data-caption="April 25🖤">
       <img class="polaroid-img" src="pb1.png" alt="Us"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="polaroid-placeholder" style="display:none;">
-        <span>📷</span>
-        <p>photo1.jpg</p>
-      </div>
+      <div class="polaroid-placeholder" style="display:none;"><span>📷</span><p>pb1.png</p></div>
       <span class="polaroid-caption">April 25🖤</span>
     </div>
 
-    <!-- Photo 2 -->
-    <div class="polaroid">
+    <div class="polaroid" data-src="pb2.png" data-caption="April 26🌹">
       <img class="polaroid-img" src="pb2.png" alt="Us"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="polaroid-placeholder" style="display:none;">
-        <span>📷</span>
-        <p>photo2.jpg</p>
-      </div>
-      <span class="polaroid-caption">April 25🌹</span>
+      <div class="polaroid-placeholder" style="display:none;"><span>📷</span><p>pb2.png</p></div>
+      <span class="polaroid-caption">April 26🌹</span>
     </div>
 
-    <!-- Photo 3 -->
-    <div class="polaroid">
+    <div class="polaroid" data-src="pb3.jpg" data-caption="April 27🖤">
       <img class="polaroid-img" src="pb3.jpg" alt="Us"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="polaroid-placeholder" style="display:none;">
-        <span>📷</span>
-        <p>pb3.jpg</p>
-      </div>
+      <div class="polaroid-placeholder" style="display:none;"><span>📷</span><p>pb3.jpg</p></div>
       <span class="polaroid-caption">April 27🖤</span>
     </div>
 
-    <!-- ✏️ COPY FROM HERE to add a new photo after your next date -->
+    <!-- ✏️ COPY FROM HERE to add a new photo -->
     <!--
-    <div class="polaroid">
-      <img class="polaroid-img" src="photo4.jpg" alt="Us"
+    <div class="polaroid" data-src="pb4.jpg" data-caption="your caption 🌸">
+      <img class="polaroid-img" src="pb4.jpg" alt="Us"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-      <div class="polaroid-placeholder" style="display:none;">
-        <span>📷</span>
-        <p>photo4.jpg</p>
-      </div>
-      <span class="polaroid-caption">your caption here 🌸</span>
+      <div class="polaroid-placeholder" style="display:none;"><span>📷</span><p>pb4.jpg</p></div>
+      <span class="polaroid-caption">your caption 🌸</span>
     </div>
     -->
 
@@ -248,7 +280,7 @@ body{
   <div class="add-note">
     <span>🗓️</span>
     <span>More photos coming soon — after our next date.<br/>
-    To add: save as <strong>photo4.jpg</strong>, uncomment the block above.</span>
+    To add: save as <strong>pb4.jpg</strong>, uncomment the block above.</span>
   </div>
 
   <div class="divider"><span>🖤</span></div>
@@ -262,8 +294,19 @@ body{
 
 </div>
 
+<!-- ── Lightbox ── -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <button class="lightbox-close" id="lbClose" aria-label="Close">✕</button>
+  <img class="lightbox-img" id="lbImg" src="" alt="photo">
+  <p class="lightbox-caption" id="lbCaption"></p>
+  <div class="lightbox-nav">
+    <button id="lbPrev" aria-label="Previous">‹</button>
+    <button id="lbNext" aria-label="Next">›</button>
+  </div>
+</div>
+
 <script>
-// Stars
+// ── Stars ──
 const starsEl=document.getElementById('stars');
 for(let i=0;i<120;i++){
   const s=document.createElement('div');s.className='star';
@@ -272,15 +315,65 @@ for(let i=0;i<120;i++){
   starsEl.appendChild(s);
 }
 
-// Petals
+// ── Petals ──
 const petalsEl=document.getElementById('petals');
-const emojis=['🌹','🥀','🌸'];
-for(let i=0;i<12;i++){
-  const p=document.createElement('div');p.className='petal';
-  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-  p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${12+Math.random()*16}s;animation-delay:${Math.random()*14}s;font-size:${0.7+Math.random()*0.9}rem;`;
-  petalsEl.appendChild(p);
+['🌹','🥀','🌸'].forEach((e,_,arr)=>{
+  for(let i=0;i<4;i++){
+    const p=document.createElement('div');p.className='petal';
+    p.textContent=arr[Math.floor(Math.random()*arr.length)];
+    p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${12+Math.random()*16}s;animation-delay:${Math.random()*14}s;font-size:${0.7+Math.random()*0.9}rem;`;
+    petalsEl.appendChild(p);
+  }
+});
+
+// ── Timer: April 13 2025 8:27 PM PH (UTC+8) ──
+const START = new Date('2026-04-13T20:27:00+08:00').getTime();
+function pad(n){return String(n).padStart(2,'0');}
+function updateTimer(){
+  const diff = Date.now() - START;
+  const s = Math.floor(diff/1000);
+  const days = Math.floor(s/86400);
+  const hrs  = Math.floor((s%86400)/3600);
+  const mins = Math.floor((s%3600)/60);
+  const secs = s%60;
+  document.getElementById('timer').innerHTML =
+    `<span>${days}</span> days &nbsp;·&nbsp; <span>${pad(hrs)}</span> hrs &nbsp;·&nbsp; <span>${pad(mins)}</span> mins &nbsp;·&nbsp; <span>${pad(secs)}</span> secs`;
 }
+updateTimer();
+setInterval(updateTimer,1000);
+
+// ── Lightbox ──
+const photos=[...document.querySelectorAll('.polaroid')].map(p=>({
+  src:p.dataset.src, caption:p.dataset.caption
+}));
+let cur=0;
+const lb    =document.getElementById('lightbox');
+const lbImg =document.getElementById('lbImg');
+const lbCap =document.getElementById('lbCaption');
+
+function openLb(i){
+  cur=i;
+  lbImg.src=photos[i].src;
+  lbCap.textContent=photos[i].caption;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLb(){
+  lb.classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.querySelectorAll('.polaroid').forEach((el,i)=>el.addEventListener('click',()=>openLb(i)));
+document.getElementById('lbClose').addEventListener('click',closeLb);
+document.getElementById('lbPrev').addEventListener('click',()=>openLb((cur-1+photos.length)%photos.length));
+document.getElementById('lbNext').addEventListener('click',()=>openLb((cur+1)%photos.length));
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb();});
+document.addEventListener('keydown',e=>{
+  if(!lb.classList.contains('open'))return;
+  if(e.key==='Escape')closeLb();
+  if(e.key==='ArrowLeft')openLb((cur-1+photos.length)%photos.length);
+  if(e.key==='ArrowRight')openLb((cur+1)%photos.length);
+});
 </script>
 </body>
 </html>
