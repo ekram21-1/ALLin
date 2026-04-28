@@ -37,18 +37,116 @@ body{
     radial-gradient(ellipse 40% 40% at 50% 50%, rgba(201,168,108,0.05) 0%, transparent 60%);
 }
 
-/* Stars */
 #stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .star{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:0.05;}50%{opacity:0.6;}}
 
-/* Petals */
 .petal{position:fixed;z-index:0;pointer-events:none;font-size:1rem;opacity:0;animation:petalFall linear infinite;}
 @keyframes petalFall{
   0%{transform:translateY(-5vh) rotate(0deg) translateX(0px);opacity:0;}
-  8%{opacity:0.35;}
-  92%{opacity:0.15;}
+  8%{opacity:0.35;}92%{opacity:0.15;}
   100%{transform:translateY(108vh) rotate(400deg) translateX(30px);opacity:0;}
+}
+
+/* ══════════════════════════════
+   PASSWORD LOCK SCREEN
+══════════════════════════════ */
+#lockScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:2rem;
+  transition:opacity 0.8s ease, visibility 0.8s ease;
+}
+#lockScreen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+.lock-rose{font-size:2.8rem;margin-bottom:1.4rem;animation:pulse 2.5s ease-in-out infinite;}
+.lock-eyebrow{
+  font-size:0.62rem;letter-spacing:0.32em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:0.7rem;
+}
+.lock-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,8vw,3.8rem);
+  font-weight:300;line-height:1.1;
+  color:var(--text);margin-bottom:0.4rem;
+}
+.lock-title em{font-style:italic;color:var(--rose);}
+.lock-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;font-style:italic;
+  color:var(--muted);margin-bottom:2.5rem;line-height:1.6;
+}
+
+.lock-form{
+  display:flex;flex-direction:column;align-items:center;gap:1rem;
+  width:100%;max-width:280px;
+}
+.lock-input{
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(194,116,142,0.3);
+  border-radius:12px;
+  padding:0.9rem 1.2rem;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:1.1rem;
+  letter-spacing:0.25em;
+  text-align:center;
+  outline:none;
+  transition:border-color 0.25s, box-shadow 0.25s;
+}
+.lock-input:focus{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(194,116,142,0.12);
+}
+.lock-input.error{
+  border-color:#e05c7a;
+  animation:shake 0.4s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-8px);}
+  40%{transform:translateX(8px);}
+  60%{transform:translateX(-5px);}
+  80%{transform:translateX(5px);}
+}
+
+.lock-btn{
+  width:100%;
+  background:linear-gradient(135deg, var(--deep), var(--rose));
+  border:none;border-radius:12px;
+  padding:0.9rem 1.2rem;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.82rem;letter-spacing:0.18em;text-transform:uppercase;
+  cursor:pointer;
+  transition:opacity 0.2s, transform 0.2s;
+}
+.lock-btn:hover{opacity:0.88;transform:translateY(-1px);}
+.lock-btn:active{transform:translateY(0);}
+
+.lock-hint{
+  font-size:0.68rem;color:var(--muted);
+  font-style:italic;margin-top:0.2rem;
+  min-height:1rem;
+  transition:opacity 0.2s;
+}
+.lock-hint.show{color:#e05c7a;opacity:1;}
+
+/* ══════════════════════════════
+   MAIN CONTENT (hidden until unlocked)
+══════════════════════════════ */
+#mainContent{
+  opacity:0;
+  transition:opacity 0.8s ease 0.1s;
+  pointer-events:none;
+}
+#mainContent.visible{
+  opacity:1;
+  pointer-events:auto;
 }
 
 /* ── Hero ── */
@@ -80,11 +178,7 @@ body{
   animation:fadeUp 1.1s ease 0.5s forwards;
   position:relative;
 }
-.hero-name em{
-  font-style:italic;
-  color:var(--rose);
-  display:block;
-}
+.hero-name em{font-style:italic;color:var(--rose);display:block;}
 
 .hero-sub{
   font-family:'Cormorant Garamond',serif;
@@ -169,25 +263,10 @@ body{
 }
 .card:hover::before{opacity:1;}
 
-.card-icon{
-  font-size:2.2rem;
-  line-height:1;
-  filter:drop-shadow(0 0 12px rgba(194,116,142,0.4));
-}
-.card-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.4rem;font-weight:400;
-  color:var(--text);line-height:1.2;
-}
-.card-desc{
-  font-size:0.8rem;color:var(--muted);line-height:1.6;
-  font-weight:300;flex:1;
-}
-.card-arrow{
-  font-size:0.75rem;color:var(--rose);
-  letter-spacing:0.1em;margin-top:0.4rem;
-  transition:transform 0.25s;display:inline-block;
-}
+.card-icon{font-size:2.2rem;line-height:1;filter:drop-shadow(0 0 12px rgba(194,116,142,0.4));}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--text);line-height:1.2;}
+.card-desc{font-size:0.8rem;color:var(--muted);line-height:1.6;font-weight:300;flex:1;}
+.card-arrow{font-size:0.75rem;color:var(--rose);letter-spacing:0.1em;margin-top:0.4rem;transition:transform 0.25s;display:inline-block;}
 .card:hover .card-arrow{transform:translateX(4px);}
 
 /* ── Footer ── */
@@ -196,18 +275,12 @@ body{
   text-align:center;
   padding:4rem 2rem 6rem;
 }
-.footer-rose{
-  font-size:3rem;
-  animation:pulse 2.5s ease-in-out infinite;
-  display:block;margin-bottom:1.2rem;
-}
+.footer-rose{font-size:3rem;animation:pulse 2.5s ease-in-out infinite;display:block;margin-bottom:1.2rem;}
 @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
 .footer-text{
   font-family:'Cormorant Garamond',serif;
   font-size:clamp(1rem,3vw,1.25rem);
-  font-style:italic;
-  color:var(--muted);
-  line-height:1.8;
+  font-style:italic;color:var(--muted);line-height:1.8;
 }
 .footer-text strong{color:var(--rose);font-style:normal;}
 
@@ -220,7 +293,6 @@ body{
 }
 .divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--rose);}
 
-/* ── Animations ── */
 @keyframes fadeUp{
   from{opacity:0;transform:translateY(24px);}
   to{opacity:1;transform:translateY(0);}
@@ -242,6 +314,33 @@ body{
 <div id="stars"></div>
 <div id="petals"></div>
 
+<!-- ══════════════════════════════
+     PASSWORD LOCK SCREEN
+══════════════════════════════ -->
+<div id="lockScreen">
+  <div class="lock-rose">🌹</div>
+  <p class="lock-eyebrow">this was made just for you</p>
+  <h2 class="lock-title">Enter the<br/><em>password</em></h2>
+  <p class="lock-sub">Only one person knows this. 🖤</p>
+  <div class="lock-form">
+    <input
+      class="lock-input"
+      id="lockInput"
+      type="password"
+      placeholder="••••••••"
+      autocomplete="off"
+      maxlength="20"
+    />
+    <button class="lock-btn" id="lockBtn">Unlock →</button>
+    <p class="lock-hint" id="lockHint">&nbsp;</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MAIN CONTENT
+══════════════════════════════ -->
+<div id="mainContent">
+
 <!-- Hero -->
 <section class="hero">
   <p class="hero-eyebrow">made with love, just for</p>
@@ -253,22 +352,6 @@ body{
   <div class="scroll-hint">
     <div class="scroll-line"></div>
     <span>explore</span>
-
-    <a class="card" href="photobooth.html">
-      <div class="card-icon">🎞️</div>
-      <div class="card-title">Our Photobooth</div>
-      <div class="card-desc">Every frame we shared together — captured, kept, and cherished forever.</div>
-      <span class="card-arrow">View →</span>
-    </a>
-
-
-    <a class="card" href="livepb.html">
-      <div class="card-icon">🤳</div>
-      <div class="card-title">Live Photobooth</div>
-      <div class="card-desc">Take 4 real photos together and get a printable romantic strip — right in the browser.</div>
-      <span class="card-arrow">Open →</span>
-    </a>
-
   </div>
 </section>
 
@@ -300,13 +383,12 @@ body{
       <span class="card-arrow">View →</span>
     </a>
 
-    <a class="card" href="for%20paris.html">
+    <a class="card" href="letter.html">
       <div class="card-icon">🌸</div>
       <div class="card-title">What I Love About You</div>
       <div class="card-desc">All the little things about you that I notice, appreciate, and adore.</div>
       <span class="card-arrow">Read →</span>
     </a>
-
 
     <a class="card" href="photobooth.html">
       <div class="card-icon">🎞️</div>
@@ -314,7 +396,6 @@ body{
       <div class="card-desc">Every frame we shared together — captured, kept, and cherished forever.</div>
       <span class="card-arrow">View →</span>
     </a>
-
 
     <a class="card" href="livepb.html">
       <div class="card-icon">🤳</div>
@@ -339,9 +420,11 @@ body{
   <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--muted);letter-spacing:0.12em;">— Marky 🖤</p>
 </footer>
 
+</div><!-- end #mainContent -->
+
 <script>
-// Stars
-const starsEl = document.getElementById('stars');
+// ── Stars ──
+const starsEl=document.getElementById('stars');
 for(let i=0;i<140;i++){
   const s=document.createElement('div');s.className='star';
   const sz=Math.random()*2+0.4;
@@ -349,7 +432,7 @@ for(let i=0;i<140;i++){
   starsEl.appendChild(s);
 }
 
-// Petals
+// ── Petals ──
 const petalsEl=document.getElementById('petals');
 const emojis=['🌹','🌸','🌺','🥀','✿'];
 for(let i=0;i<16;i++){
@@ -359,15 +442,44 @@ for(let i=0;i<16;i++){
   petalsEl.appendChild(p);
 }
 
-// Scroll reveal
-const observer = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.classList.add('visible');
-    }
-  });
-},{threshold:0.15});
+// ── Password Lock ──
+const PASS = '01050624';
+const lockScreen = document.getElementById('lockScreen');
+const mainContent = document.getElementById('mainContent');
+const lockInput   = document.getElementById('lockInput');
+const lockBtn     = document.getElementById('lockBtn');
+const lockHint    = document.getElementById('lockHint');
 
+// Check if already unlocked this session
+if(sessionStorage.getItem('unlocked')==='yes'){
+  lockScreen.classList.add('hidden');
+  mainContent.classList.add('visible');
+}
+
+function tryUnlock(){
+  if(lockInput.value === PASS){
+    sessionStorage.setItem('unlocked','yes');
+    lockScreen.classList.add('hidden');
+    mainContent.classList.add('visible');
+  } else {
+    lockInput.classList.add('error');
+    lockHint.textContent = 'wrong password, try again 🖤';
+    lockHint.classList.add('show');
+    setTimeout(()=>{
+      lockInput.classList.remove('error');
+      lockInput.value='';
+      lockInput.focus();
+    },500);
+  }
+}
+
+lockBtn.addEventListener('click', tryUnlock);
+lockInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+
+// ── Scroll reveal ──
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.15});
 document.querySelectorAll('.section-label, .card').forEach(el=>observer.observe(el));
 </script>
 </body>
